@@ -1,5 +1,5 @@
 # texts' semantic similarity test
-
+# 
 import os, sys, json, pickle
 import datetime as dt
 import numpy as np
