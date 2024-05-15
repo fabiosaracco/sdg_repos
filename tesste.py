@@ -13,22 +13,25 @@ from tqdm.autonotebook import tqdm, trange
 from scipy.stats._continuous_distns import _distn_names
 import scipy.stats as st
 
+from multiprocessing import Pool
 
 class tesste:
     
-    def __init__(self, text_0, text_1, n_sample=10**3, verbose=False):
+    def __init__(self, text_0, text_1, n_sample=10**3, verbose=False, n_workers=1):
         if verbose:
             print('[{:%H:%M:%S}]\t{:}\t starting!'.format(dt.datetime.now(),inspect.currentframe().f_code.co_name))
+            
         self.text_0=text_0
         self.text_1=text_1
         self.n_sample=n_sample
-        
         self.verbose=verbose
+        self.n_workers=n_workers
+        
         self.model_name="all-MiniLM-L6-v2"
         if self.verbose:
             print('[{:%H:%M:%S}]\t{:}\t model={:}'.format(dt.datetime.now(),inspect.currentframe().f_code.co_name, self.model_name))
         
-        self.model = SentenceTransformer(model_name)
+        self.model = SentenceTransformer(self.model_name)
         
         self.se_emb_0 = self.model.encode(text_0)
         self.se_emb_1 = self.model.encode(text_1)
@@ -47,15 +50,28 @@ class tesste:
         shuffled_embedding = model.encode(shuffled_text)
         return shuffled_embedding
     
+    @staticmethod
+    def single_step_randomization(fake, text_0, text_1, model):
+        se_ra_te_0=self.semantic_randomizer(text_0, model)
+        se_ra_te_1=self.semantic_randomizer(text_1, model)
+        return util.cos_sim(se_ra_te_0,se_ra_te_1)[0,0].tolist()
+            
+    
     def va_co_si(self):
         # validate cosine similarity
         if self.verbose:
             print('[{:%H:%M:%S}]\t{:}'.format(dt.datetime.now(),inspect.currentframe().f_code.co_name))
-        self.ra_se_co_si=np.zeros(self.n_sample)
-        for i in trange(self.n_sample, leave=False):
-            se_ra_te_0=self.semantic_randomizer(self.text_0, self.model)
-            se_ra_te_1=self.semantic_randomizer(self.text_1, self.model)
-            self.ra_se_co_si[i]=util.cos_sim(se_ra_te_0,se_ra_te_1)[0,0].tolist()
+        
+        si_ste_r=partial(single_step_randomization, self.text_0, self.text_1, self.model)
+        
+        if self.n_workers==1:
+            self.ra_se_co_si=np.zeros(self.n_sample)
+            for i in trange(self.n_sample, leave=False):
+                self.ra_se_co_si[i]=si_ste_r(1)
+        else:
+            with Pool(self.n_workers) as pool:
+                self.ra_se_co_si=pool.map(si_ste_r, range(self.n_sample))
+            self.ra_se_co_si=np.array(self.ra_se_co_si)
             
     def fit_cos_sim_mielke(self):
         if self.verbose:
