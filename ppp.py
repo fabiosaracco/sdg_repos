@@ -3,6 +3,10 @@ from pypdf import PdfReader
 
 def ppp(file, page=None):
     reader = PdfReader(file)
+    
+    if reader.is_encrypted:
+        reader.decrypt(password='')
+        
     n_pages=reader.get_num_pages()
     # all pages
     pages=reader.flattened_pages
