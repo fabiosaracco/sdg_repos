@@ -6,7 +6,7 @@ import argparse
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--folder', '-f', dest=folder,
+    parser.add_argument('--folder', '-f', dest='folder',
                     help='the folder where the files to unzip are')
 
     return parser
@@ -19,11 +19,11 @@ def unzipper(folder, file_to_unzip):
     # take the 'summaries' text out
     out_folder_file=out_folder_file.split('_')[:-1]
     # get two indices for the number at the beginning of the string
-    ordering=int(out_folder_file[0]).zfill(2)
+    ordering=str(int(out_folder_file[0])).zfill(2)
     # rebuilt the string without the first number
     out_folder_file='_'.join(out_folder_file[1:])
     # replace blanks with underscores
-    out_folder_file.replace(' ', '_')
+    out_folder_file=out_folder_file.replace(' ', '_')
     # add the number
     out_folder_file=ordering+'_'+out_folder_file
     
@@ -44,9 +44,13 @@ def unzipper(folder, file_to_unzip):
         
 
     # unzip all files in the folder
-    with zipfile.ZipFile(folder+path_to_zip_file, 'r') as zip_ref:
+    with zipfile.ZipFile(folder+file_to_unzip, 'r') as zip_ref:
         zip_ref.extractall(fifo_name)
-
+        
+    # delete the zip file
+    os.remove(folder+file_to_unzip)
+    
+    
 def main():
     # unzip all zip files
     
@@ -54,10 +58,12 @@ def main():
     args = parser.parse_args()
     folder=args.folder
     
-    files=os.listdir(folder)
+    files=[file for file in os.listdir(folder) if file.endswith('.zip')]
+    
+    files.sort()
     
     for file in tqdm(files):
-        unzipper(folder, file_to_unzip)
+        unzipper(folder, file)
         
     
         
