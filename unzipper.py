@@ -4,6 +4,21 @@ from tqdm.autonotebook import trange, tqdm
 
 import argparse
 
+def main():
+    # unzip all zip files
+    
+    parser = get_parser()
+    args = parser.parse_args()
+    folder=args.folder
+    
+    files=[file for file in os.listdir(folder) if file.endswith('.zip')]
+    
+    files.sort()
+    
+    for file in tqdm(files):
+        unzipper(folder, file)
+        
+
 def get_parser():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--folder', '-f', dest='folder',
@@ -17,7 +32,8 @@ def unzipper(folder, file_to_unzip):
     # take the extension of file out
     out_folder_file=file_to_unzip.split('.')[0]
     # take the 'summaries' text out
-    out_folder_file=out_folder_file.split('_')[:-1]
+    out_folder_file=out_folder_file.replace('summaries', '')
+    out_folder_file=out_folder_file.split('_')
     # get two indices for the number at the beginning of the string
     ordering=str(int(out_folder_file[0])).zfill(2)
     # rebuilt the string without the first number
@@ -50,21 +66,6 @@ def unzipper(folder, file_to_unzip):
     # delete the zip file
     os.remove(folder+file_to_unzip)
     
-    
-def main():
-    # unzip all zip files
-    
-    parser = get_parser()
-    args = parser.parse_args()
-    folder=args.folder
-    
-    files=[file for file in os.listdir(folder) if file.endswith('.zip')]
-    
-    files.sort()
-    
-    for file in tqdm(files):
-        unzipper(folder, file)
-        
     
         
 if __name__ == "__main__":
