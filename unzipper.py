@@ -32,7 +32,8 @@ def unzipper(folder, file_to_unzip):
     # take the extension of file out
     out_folder_file=file_to_unzip.split('.')[0]
     # take the 'summaries' text out
-    out_folder_file=out_folder_file.replace('summaries', '')
+    for bad_word in ['_summaries', 'summaries', '_Summary', 'Summary', '_Summaries', 'Summaries', '_summaries', 'summaries']:
+        out_folder_file=out_folder_file.replace(bad_word, '')
     out_folder_file=out_folder_file.split('_')
     # get two indices for the number at the beginning of the string
     ordering=str(int(out_folder_file[0])).zfill(2)
