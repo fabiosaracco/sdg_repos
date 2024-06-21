@@ -6,7 +6,7 @@ def file2text(file):
     full_text=''
     for par in doc.paragraphs:
         full_text+='\n'+par.text
-    return 
+    return full_text
     
 
 def text2vec(text):
@@ -19,13 +19,15 @@ def text2vec(text):
     while counter<len(aux):
         _a=aux[counter]
         if len(_a)>0:
-            if _a[:3]=='SDG' and aux[counter+1]!='Not explicitly mentioned.':
+            if _a[:3]=='SDG' and 'Not explicitly mentioned' not in aux[counter+1]:
                 sdgs_vec[sdgs_vec_i]=1
                 counter+=2
                 sdgs_vec_i+=1
-            elif _a[:3]=='SDG' and aux[counter+1]=='Not explicitly mentioned.':
+            elif _a[:3]=='SDG' and 'Not explicitly mentioned' in aux[counter+1]:
                 counter+=2
                 sdgs_vec_i+=1
+            else:
+                counter+=1
         else:
             counter+=1
     return sdgs_vec
@@ -39,11 +41,13 @@ def text2dict(text):
     while counter<len(aux):
         _a=aux[counter]
         if len(_a)>0:
-            if _a[:3]=='SDG' and aux[counter+1]!='Not explicitly mentioned.':
+            if _a[:3]=='SDG' and 'Not explicitly mentioned' not in aux[counter+1]:
                 sdgs_dict[_a]=aux[counter+1]
                 counter+=2
-            elif _a[:3]=='SDG' and aux[counter+1]=='Not explicitly mentioned.':
+            elif _a[:3]=='SDG' and 'Not explicitly mentioned' in aux[counter+1]:
                 counter+=2
+            else:
+                counter+=1
         else:
             counter+=1
     return sdgs_dict
