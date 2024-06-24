@@ -13,11 +13,12 @@ from tqdm.autonotebook import tqdm, trange
 from scipy.stats._continuous_distns import _distn_names
 import scipy.stats as st
 
+from multiprocessing import Pool
 from functools import partial
 
 class tesste:
     
-    def __init__(self, text_0, text_1, n_sample=10**3, verbose=False):
+    def __init__(self, text_0, text_1, n_sample=10**3, verbose=False, tqdm_loops=True):
         if verbose:
             print('[{:%H:%M:%S}]\t{:}\t starting!'.format(dt.datetime.now(),inspect.currentframe().f_code.co_name))
             
@@ -25,6 +26,7 @@ class tesste:
         self.text_1=text_1
         self.n_sample=n_sample
         self.verbose=verbose
+        self.tqdm_loops=tqdm_loops
         
         self.model_name="all-MiniLM-L6-v2"
         if self.verbose:
@@ -39,6 +41,7 @@ class tesste:
         self.va_co_si()
         self.fit_cos_sim_mielke()
         self.pval=self.get_pvalue(self.cos_sim, st.mielke, self.cosi_arg, self.cosi_loc, self.cosi_scale)
+        self.sampled_pval=np.sum(self.ra_se_co_si>=self.cos_sim)/self.n_sample
         
     
     @staticmethod
@@ -63,8 +66,13 @@ class tesste:
         
         
         self.ra_se_co_si=np.zeros(self.n_sample)
-        for i in trange(self.n_sample, leave=False):
-            self.ra_se_co_si[i]=self.single_step_randomization(1)
+        if self.tqdm_loops:
+            for i in trange(self.n_sample, leave=False):
+                self.ra_se_co_si[i]=self.single_step_randomization(1)
+        else:
+            for i in range(self.n_sample):
+                self.ra_se_co_si[i]=self.single_step_randomization(1)
+            
             
     def fit_cos_sim_mielke(self):
         if self.verbose:
