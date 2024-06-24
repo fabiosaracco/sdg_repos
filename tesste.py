@@ -63,7 +63,7 @@ class tesste:
         # validate cosine similarity
         if self.verbose:
             print('[{:%H:%M:%S}]\t{:}'.format(dt.datetime.now(),inspect.currentframe().f_code.co_name))
-        
+            print('[{:%H:%M:%S}]\tself.n_sample={:}'.format(dt.datetime.now(),self.n_sample))
         
         self.ra_se_co_si=np.zeros(self.n_sample)
         if self.tqdm_loops:
