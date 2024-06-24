@@ -18,7 +18,7 @@ def text2vec(sdgs_dict):
     # Here I brutally binarized by presence/absence of mention in the report of the given SDG
     # there are 17 sdgs, starting from the entries from text2dict
     sdgs_vec=np.zeros(17, dtype=int)
-    for key in sdg_dict.keys():
+    for key in sdgs_dict.keys():
         which=int(key.split(':')[0].split(' ')[1])-1
         sdgs_vec[which]=1
     return sdgs_vec

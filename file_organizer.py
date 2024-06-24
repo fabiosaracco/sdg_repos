@@ -26,7 +26,7 @@ def main():
     
     
 def get_parser():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--folder', '-f', dest='folder',
                     help='the folder to be organized are')
     return parser    
