@@ -28,31 +28,32 @@ def text2dict(text):
     # the information contained here is the same of the entire text, but organised per SDG...
     sdgs_dict={}
     counter=0
+    # the issue is that there are plenty of entries that do not meet any rigorous pattern, 
+    # therefore the only way out is to consider as a description of the activities over an SDGs
+    # everything that is between the names of two different SDGs
     aux=text.split('\n')
-    while counter<len(aux):
-        _a=aux[counter]
+    if all([sdg in aux for sdg in sdgs]):
+        # well-behaving text
+        w_sdgs=[np.where(np.array(aux)==sdg)[0][0] for sdg in sdgs]
 
-        if len(_a)>0:
-            if 'SDG' in _a:
-                sdg=[sdg for sdg in sdgs if sdg in _a]
-                if len(sdg)==1:
-                    sdg=sdg[0]
-                    # well-behaving text
-                    if _a==sdg and 'Not explicitly mentioned' not in aux[counter+1]:
-                        sdgs_dict[_a]=aux[counter+1]
-                        counter+=2
-                    elif _a==sdg and 'Not explicitly mentioned' in aux[counter+1]:
-                        counter+=2
-                    else:
-                        # not well-behaving text
-                        _text=_a.split(sdg)[1]
-                        if 'Not explicitly mentioned' not in _text:
-                            sdgs_dict[sdg]=_text.strip().replace('\u200b', '')
-                        counter+=1
-                else:
-                    counter+=1
+        for i_sdg, sdg in enumerate(sdgs):
+            if i_sdg<len(sdgs)-1:
+                my_text=aux[w_sdgs[i_sdg]+1:w_sdgs[i_sdg+1]]
             else:
-                counter+=1
-        else:
-            counter+=1
-    return sdgs_dict
+                my_text=aux[w_sdgs[i_sdg]+1:]
+            if type(my_text)==list:
+                my_text=' '.join(my_text)
+            if 'Not explicitly mentioned' not in my_text:
+                sdgs_dict[sdg]=my_text.replace('\u200b', '').strip()
+    
+        return sdgs_dict, 0
+    else:
+        # not well behaving text: the sdg is not divided from the rest of the text by a colon (:)
+        for i_sdg, sdg in enumerate(sdgs):
+            if i_sdg<len(sdgs)-1:
+                my_text=text.split(sdgs[i_sdg])[1].split(sdgs[i_sdg+1])[0].replace('\n', '').strip()
+            else:
+                my_text=text.split(sdgs[-1])[1].strip()
+            if 'Not explicitly mentioned' not in my_text:
+                sdgs_dict[sdg]=my_text.replace('\u200b', '').strip()
+        return sdgs_dict, 1
